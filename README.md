@@ -3,10 +3,6 @@
 A reusable Kotlin form engine and native Android renderer for JSON-defined forms.
 The sample is a site-inspection app with conditional fields and offline drafts.
 
-This is an independent, newly built project by Victor Adewumi. It demonstrates
-server-driven UI and SDK architecture using original sample code and synthetic
-data. It contains no employer code, production schemas or customer information.
-
 ## What works
 
 - Four field types: text, decimal number, single choice and explicit yes/no.

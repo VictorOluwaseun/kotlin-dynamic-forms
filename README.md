@@ -16,9 +16,6 @@ The sample is a site-inspection app with conditional fields and offline drafts.
 - Local validation and a selectable JSON payload preview.
 - Core tests, ViewModel tests, Room device tests and a Compose interaction test.
 
-**Status:** initial working implementation, not a production-certified SDK.
-See [verification](docs/VERIFICATION.md) for checks actually run.
-
 ## Run
 
 Prerequisites: JDK 17, Android SDK Platform 35 and Build Tools 35.0.0.

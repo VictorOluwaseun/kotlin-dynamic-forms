@@ -1,6 +1,7 @@
 # Verification
 
-Checked on 12 October 2026 with JDK 17, Gradle 8.11.1 and Android SDK 35.
+Rechecked on 12 October 2026 after selecting JDK 17.0.14 for Gradle 8.11.1,
+with Android SDK 35 for compilation and an API 36 emulator for device tests.
 
 | Check | Result |
 | --- | --- |
@@ -11,12 +12,17 @@ Checked on 12 October 2026 with JDK 17, Gradle 8.11.1 and Android SDK 35.
 | Demo debug APK | Built successfully |
 | Compose release AAR | Built successfully |
 | Demo and Compose Android test APKs | Built successfully |
-| Demo and Compose Android lint | No issues found |
+| Room draft persistence device test | 1 passed on the API 36 emulator; also passed on a Samsung SM-A556E running Android 16 |
+| Compose conditional-field interaction device test | 1 passed on the API 36 emulator |
+| Demo Android lint | No errors; 46 warnings about pinned dependencies, AGP and target SDK |
+| Compose Android lint | No issues found |
 
-The device test sources cover Room draft persistence and Compose conditional-field
-interaction. They were compiled and packaged, **not executed**: no Android device
-or emulator was available. The app has not yet had a visual, accessibility or
-real-device lifecycle walkthrough. A successful build does not replace those checks.
+The device tests executed Room draft persistence and Compose conditional-field
+interaction. The Compose test APK now explicitly targets API 35; its default API 26
+target triggered a compatibility dialog on Android 16 and obstructed the UI test.
+Both device tests passed on an API 36 emulator after that configuration change.
+The app has not yet had a manual visual, accessibility or lifecycle walkthrough.
+A successful automated run does not replace those checks.
 
 This record covers local checks. See the repository's [GitHub Actions runs](https://github.com/VictorOluwaseun/kotlin-dynamic-forms/actions)
 for CI results. Maven publication is configured but has not been exercised or uploaded.
@@ -32,8 +38,10 @@ source and the workflow are sufficient to rebuild it.
   :demo:assembleDebugAndroidTest :forms-compose:assembleDebugAndroidTest \
   :demo:lintDebug :forms-compose:lintDebug :forms-compose:bundleReleaseAar
 ./gradlew -PcoreOnly :forms-core:test
+./gradlew :demo:connectedDebugAndroidTest :forms-compose:connectedDebugAndroidTest \
+  --no-parallel
 ```
 
-Dependencies were cached before the final build; the final commands also used
-`--offline`. After the demo icon and backup configuration were added, its APK,
-Android test APK and lint were checked again successfully.
+All commands used JDK 17.0.14. Dependencies were downloaded for the initial build
+and device run. The standalone core check and final emulator run used `--offline`;
+the emulator run also reran Compose lint. `ANDROID_SERIAL` selected the test device.

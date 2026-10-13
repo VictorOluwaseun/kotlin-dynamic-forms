@@ -44,6 +44,7 @@ class MainActivity : ComponentActivity() {
                     onClear = model::clearDraft,
                     onReview = model::previewSubmission,
                     onDismiss = model::dismissPreview,
+                    onContinueEditing = model::continueEditing,
                 )
             }
         }

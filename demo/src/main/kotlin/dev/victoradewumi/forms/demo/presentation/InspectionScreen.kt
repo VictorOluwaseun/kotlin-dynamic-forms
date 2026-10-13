@@ -1,5 +1,6 @@
 package dev.victoradewumi.forms.demo.presentation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -26,9 +28,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import dev.victoradewumi.forms.compose.DynamicForm
+import java.text.DateFormat
+import java.util.Date
 
 /** A functional showcase: conditional native fields, explicit offline saves and payload inspection. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,9 +46,16 @@ fun InspectionScreen(
     onClear: () -> Unit,
     onReview: () -> Unit,
     onDismiss: () -> Unit,
+    onContinueEditing: () -> Unit,
 ) {
     var confirmClear by rememberSaveable { mutableStateOf(false) }
+    val savedDraft = state.savedDraft
+    BackHandler(enabled = savedDraft != null, onBack = onContinueEditing)
     Scaffold(topBar = { TopAppBar(title = { Text("Dynamic Forms") }) }) { padding ->
+        if (savedDraft != null) {
+            SavedDraftContent(savedDraft, onContinueEditing, Modifier.padding(padding))
+            return@Scaffold
+        }
         Column(
             Modifier.fillMaxSize().padding(padding).imePadding().verticalScroll(rememberScrollState()).padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
@@ -85,5 +98,33 @@ fun InspectionScreen(
             text = { SelectionContainer { Text(json, Modifier.verticalScroll(rememberScrollState()), fontFamily = FontFamily.Monospace) } },
             confirmButton = { TextButton(onClick = onDismiss) { Text("Done") } },
         )
+    }
+}
+
+@Composable
+private fun SavedDraftContent(
+    draft: SavedDraftSummary,
+    onContinueEditing: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val savedTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
+        .format(Date.from(draft.savedAt))
+    Column(
+        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        Text(
+            "Draft saved",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(draft.siteName, style = MaterialTheme.typography.titleLarge)
+        Text("Saved $savedTime", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        HorizontalDivider()
+        Text("Your inspection is saved on this device. You can close the app and pick up where you left off when you reopen it.")
+        Button(onClick = onContinueEditing, modifier = Modifier.fillMaxWidth()) {
+            Text("Continue editing")
+        }
     }
 }
